@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <Feed msg="This is my feed, whatever passes through this prop is a feed item"/>
-    <Playspace msg="This is my PlaySpace, everything coming in here is a button?"/>
-    <Elements msg="This is my Elements, everything coming in here is a change to my elements table."/>
+    <Feed :feed="this.$store.state.feed"/>
+    <Playspace :title="this.$store.state.space"/>
+    <Elements title="Elements"/>
   </div>
 </template>
 
@@ -20,4 +20,25 @@ export default {
   }
 }
 </script>
+
+<style>
+  #app {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color: lightgreen;
+  }
+
+  h1 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15pt;
+    margin: 0;
+    position: relative;
+    top: -10px;
+    left: 10px;
+  }
+</style>
 
