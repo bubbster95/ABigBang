@@ -1,28 +1,23 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Feed msg="This is my feed, whatever passes through this prop is a feed item"/>
+    <Playspace msg="This is my PlaySpace, everything coming in here is a button?"/>
+    <Elements msg="This is my Elements, everything coming in here is a change to my elements table."/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Feed from './components/Feed.vue'
+import Playspace from './components/Playspace.vue'
+import Elements from './components/Elements.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Feed,
+    Playspace,
+    Elements
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
