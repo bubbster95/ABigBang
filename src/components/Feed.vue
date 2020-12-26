@@ -18,6 +18,7 @@ export default {
 
 <style scoped>
   .feed-container {
+    position: relative;
     width: 30%;
     height: 90vh;
     margin: 10px;
@@ -25,8 +26,14 @@ export default {
     background-color: lightcyan;
   }
 
-  .feed {
-    margin: 5px;
 
+  .text-container {
+    position: absolute;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: 5px;
+    top: 0;
+    background: linear-gradient(to bottom, rgba(255 255 255 100), transparent);
   }
 </style>

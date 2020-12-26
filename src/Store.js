@@ -5,39 +5,46 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
-        feed: ['I exist, but how? all I see is darkness. Am I all there is?'],
-        SpaceButtons: {
+        feed: ['You pop into existance. Everything is dark and cold.'],
+        Space: {
             'rotate': {
+                name: 'rotate',
+                class: 'available',
                 title: 'Rotate wildly!',
-                msg: 'Your wild rotation has attracted something.',
-                click: function(action){
-                    store.commit('exchange', action);
+                msg: 'Your wild rotation is attractive.',
+                click: function(name){
+                    store.commit('exchange', name);
+                    store.commit('isMore')
                 },
-                action: 'rotate',
+                cooldown: 10,
                 elemGain: 'particles',
                 elemLoss: 'particles',
                 price: 0,
                 income: 10
             },
             'sort': {
+                name: 'sort',
+                class: 'null',
                 title: 'Sort particles',
+                availableMsg: 'You can try organizing those particles? Might find something good.',
                 msg: 'While filtering particles you found something useful.',
-                click: function(action){
-                    store.commit('exchange', action);
+                click: function(name){
+                    store.commit('exchange', name);
                 },
-                action: 'sort',
                 elemGain: 'hydrogen',
                 elemLoss: 'particles',
                 price: 10,
                 income: 5
             },
             'mass': {
+                name: 'mass',
+                class: 'null',
                 title: 'Add Mass',
+                availableMsg: 'You have enough particles to generate mass, maybe try it out?',
                 msg: 'You committed some mass to your core, your influance can reach further.',
-                click: function(action){
-                    store.commit('exchange', action);
+                click: function(name){
+                    store.commit('exchange', name);
                 },
-                action: 'mass',
                 inflation: 50,
                 elemGain: 'mass',
                 elemLoss: 'particles',
@@ -80,28 +87,34 @@ const store = new Vuex.Store({
                 state.feed.pop();
             }
         },
-        exchange (state, action) {
-            let button = state.SpaceButtons[action]
+        isMore (state) {
+            if (state.Elements['particles'].amount >= 50 && state.Space.sort.class === 'null') {
+                state.Space.sort.class = 'available';
+                state.Space.mass.class = 'available';
+            }
+        },
+        exchange (state, name) {
+            let button = state.Space[name]
             let loss = state.Elements[button.elemLoss]
             let gain = state.Elements[button.elemGain]
             if (loss.amount >= button.price){
                 loss.amount = loss.amount - button.price;
                 gain.amount = gain.amount + button.income;
-                store.commit('updateFeed', loss.msg);
+                store.commit('updateFeed', button.msg);
                 if (button.inflation) {
-                    store.commit('inflate', action)
+                    store.commit('inflate', name)
                 }
             } else {
                 store.commit('updateFeed', ('Not enough, ' + loss.title))
             }
         },
-        inflate (state, action) {
-            let button = state.SpaceButtons[action]
+        inflate (state, name) {
+            let button = state.Space[name]
             button.price += button.inflation
         }
         ,
-        deflate (state, {action, rate}) {
-            let button = state.SpaceButtons[action]
+        deflate (state, {name, rate}) {
+            let button = state.Space[name]
             button.price -= button.deflation * rate
         }
     }
