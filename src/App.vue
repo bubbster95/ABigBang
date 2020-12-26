@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <Feed :feed="this.$store.state.feed"/>
-    <Playspace :title="this.$store.state.space"/>
-    <Elements title="Elements"/>
+    <Playspace :buttons="this.$store.state.SpaceButtons"/>
+    <Elements :elements="this.$store.state.Elements"/>
   </div>
 </template>
 

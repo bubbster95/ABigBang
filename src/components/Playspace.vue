@@ -1,7 +1,7 @@
 <template>
   <div class='play-space-container'>
-      <h1>{{title}}</h1>
-      <button v-on:click="change">Change Feed</button>
+      <h1>Open Space</h1>
+      <button v-for="button in buttons" :key="button.title" v-on:click="button.click(button.msg, button.collect, button.pay, button.loss, button.price)">{{button.title}}</button>
   </div>
 </template>
 
@@ -9,12 +9,7 @@
 export default {
   name: 'Playspace',
   props: {
-    title: String
-  },
-  methods: {
-      change: function(){
-          this.$store.commit('change', 'text that gets sent when change feed button is pressed')
-      }
+    buttons: Object
   }
 }
 </script>

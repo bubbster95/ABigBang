@@ -1,8 +1,8 @@
 <template>
   <div class='feed-container'>
       <h1>Feed</h1>
-      <div class='text-container' v-on:change='read(feed)'>
-        <p class='feed'>{{feed[0]}}</p>
+      <div class='text-container'>
+        <p v-for='(line, index) in feed' :key="'line' + index">{{line}}</p>
       </div>
   </div>
 </template>
@@ -12,14 +12,6 @@ export default {
   name: 'Feed',
   props: {
     feed: Array
-  },
-  methods: {
-    read (feed) {
-      let container = document.querySelector('.text-container');
-      feed.map(text => {
-        console.log("Yoyoyoy", text, 'container', container)
-      })
-    }
   }
 }
 </script>
