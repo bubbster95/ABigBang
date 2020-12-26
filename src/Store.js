@@ -10,42 +10,51 @@ const store = new Vuex.Store({
             'rotate': {
                 title: 'Rotate wildly!',
                 msg: 'Your wild rotation has attracted something.',
-                click: function(text, elem, pay){
-                    store.commit('updateFeed', text)
-                    store.commit('income', {elem, pay})
+                click: function(action){
+                    store.commit('exchange', action);
                 },
-                collect: 'particles',
-                pay: 10
+                action: 'rotate',
+                elemGain: 'particles',
+                elemLoss: 'particles',
+                price: 0,
+                income: 10
             },
             'sort': {
                 title: 'Sort particles',
                 msg: 'While filtering particles you found something useful.',
-                click: function(text, elem, pay, loss, price){
-                    store.commit('updateFeed', text)
-                    store.commit('income', {elem, pay})
-                    store.commit('cost', {loss, price})
+                click: function(action){
+                    store.commit('exchange', action);
                 },
-                collect: 'hydrogen',
-                loss: 'particles',
+                action: 'sort',
+                elemGain: 'hydrogen',
+                elemLoss: 'particles',
                 price: 10,
-                pay: 5
+                income: 5
             },
-            'moon': {
-                title: 'Attract Moon',
-                msg: 'Jettisoning spare particles has earned you a moon; good work!',
-                click: function(text){
-                    store.commit('updateFeed', text)
-                }
+            'mass': {
+                title: 'Add Mass',
+                msg: 'You committed some mass to your core, your influance can reach further.',
+                click: function(action){
+                    store.commit('exchange', action);
+                },
+                action: 'mass',
+                inflation: 50,
+                elemGain: 'mass',
+                elemLoss: 'particles',
+                price: 100,
+                income: 100
             }
         },
         Elements: {
             'particles': {
                 title: 'Particles ',
                 amount: 0,
-                msg: 'Particles make up everything, even you. You\'re going to want a lot',
-                first: function(text){
-                    store.commit('updateFeed', text)
-                }
+                msg: 'Particles make up everything, even you. You\'re going to want a lot'
+            },
+            'mass': {
+                title: 'Mass ',
+                amount: 1,
+                msg: 'Mass is power and influance, collect more.'
             },
             'water': {
                 title: 'H2O ',
@@ -71,13 +80,29 @@ const store = new Vuex.Store({
                 state.feed.pop();
             }
         },
-        cost (state, {loss, price}) {
-            if (state.Elements[loss].amount >= price){
-                state.Elements[loss].amount = state.Elements[loss].amount - price;
+        exchange (state, action) {
+            let button = state.SpaceButtons[action]
+            let loss = state.Elements[button.elemLoss]
+            let gain = state.Elements[button.elemGain]
+            if (loss.amount >= button.price){
+                loss.amount = loss.amount - button.price;
+                gain.amount = gain.amount + button.income;
+                store.commit('updateFeed', loss.msg);
+                if (button.inflation) {
+                    store.commit('inflate', action)
+                }
+            } else {
+                store.commit('updateFeed', ('Not enough, ' + loss.title))
             }
         },
-        income (state, {elem, pay}) {
-            state.Elements[elem].amount = state.Elements[elem].amount + pay;
+        inflate (state, action) {
+            let button = state.SpaceButtons[action]
+            button.price += button.inflation
+        }
+        ,
+        deflate (state, {action, rate}) {
+            let button = state.SpaceButtons[action]
+            button.price -= button.deflation * rate
         }
     }
 })

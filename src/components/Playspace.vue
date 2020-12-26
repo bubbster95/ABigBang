@@ -1,7 +1,13 @@
 <template>
   <div class='play-space-container'>
       <h1>Open Space</h1>
-      <button v-for="button in buttons" :key="button.title" v-on:click="button.click(button.msg, button.collect, button.pay, button.loss, button.price)">{{button.title}}</button>
+      <button
+        v-for="button in buttons"
+        :key="button.title"
+        v-on:click="button.click(
+          button.action
+          )"
+          >{{button.title}}</button>
   </div>
 </template>
 
