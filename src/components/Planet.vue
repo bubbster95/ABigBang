@@ -1,5 +1,5 @@
 <template>
-  <div class='play-space-container'>
+  <div class='planet-container'>
       <div class='build-buttons' v-for="button in buttons" :key="button.title">
 
         <!-- Buttons with coolDown -->
@@ -25,10 +25,10 @@
 
 <script>
 export default {
-  name: 'Playspace',
+  name: 'Planet',
   computed: {
     buttons () {
-      return this.$store.state.Space
+      return this.$store.state.Planet
     }
   },
   methods: {
@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style scoped>
-  .play-space-container {
+  .planet-container {
     position: absolute;
     top: 0;
     left: 0;

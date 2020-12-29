@@ -56,6 +56,56 @@ const store = new Vuex.Store({
                 income: 1
             }
         },
+        Planet: {
+            'carbonMoon': {
+                name: 'carbonMoon',
+                class: 'available',
+                title: 'Carbon Moon',
+                msg: 'A ball of carbon circles around you collecting carbon on your behalf.',
+                click: function(name){
+                    store.commit('exchange', name);
+                    store.commit('isMore');
+                    store.commit('coolDown', name)
+                },
+                cooldown: 30,
+                elemGain: 'carbon',
+                elemLoss: 'mass',
+                price: 1,
+                income: 100
+            },
+            'sort': {
+                name: 'sort',
+                class: 'null',
+                title: 'Sort particles',
+                availableMsg: 'You can try organizing those particles? Might find something good.',
+                msg: 'While filtering particles you found something useful.',
+                click: function(name){
+                    store.commit('exchange', name);
+                    store.commit('chooseAmount', ['hydrogen', 'carbon', 'oxygen']);
+                    store.commit('coolDown', name);
+                },
+                cooldown: 2,
+                elemGain: 'hydrogen',
+                elemLoss: 'particles',
+                price: 10,
+                income: 0
+            },
+            'mass': {
+                name: 'mass',
+                class: 'null',
+                title: 'Add Mass',
+                availableMsg: 'You have enough particles to generate mass, maybe try it out?',
+                msg: 'You committed some mass to your core, your influance can reach further.',
+                click: function(name){
+                    store.commit('exchange', name);
+                },
+                inflation: 50,
+                elemGain: 'mass',
+                elemLoss: 'particles',
+                price: 100,
+                income: 1
+            }
+        },
         Elements: {
             'particles': {
                 title: 'Particles ',
@@ -119,7 +169,12 @@ const store = new Vuex.Store({
             }
         },
         exchange (state, name) {
-            const button = state.Space[name]
+            let button;
+            if (state.Planet[name]) {
+                button = state.Planet[name]
+            } else {
+                button = state.Space[name]
+            }
             const loss = state.Elements[button.elemLoss]
             const gain = state.Elements[button.elemGain]
             gain.class = 'element';
@@ -135,7 +190,12 @@ const store = new Vuex.Store({
             }
         },
         coolDown (state, name) {
-            const button = state.Space[name];
+            let button;
+            if (state.Planet[name]) {
+                button = state.Planet[name]
+            } else {
+                button = state.Space[name]
+            }
             const coolDown = document.getElementById(button.name + '-cool-down');
             let timer = 100;
             const originalFunction = button.click;

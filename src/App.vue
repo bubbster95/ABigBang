@@ -1,21 +1,21 @@
 <template>
   <div id="app">
     <Feed :feed="this.$store.state.feed"/>
-    <Playspace :buttons="this.$store.state.Space"/>
+    <Cosmos/>
     <Elements :elements="this.$store.state.Elements"/>
   </div>
 </template>
 
 <script>
 import Feed from './components/Feed.vue'
-import Playspace from './components/Playspace.vue'
+import Cosmos from './components/Cosmos'
 import Elements from './components/Elements.vue'
 
 export default {
   name: 'App',
   components: {
     Feed,
-    Playspace,
+    Cosmos,
     Elements
   }
 }
@@ -35,10 +35,13 @@ export default {
   h1 {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 15pt;
-    margin: 0;
+    margin: 0 10px;
+    display: inline;
     position: relative;
     top: -10px;
     left: 10px;
+    color: black;
+    text-decoration: none;
   }
 </style>
 
