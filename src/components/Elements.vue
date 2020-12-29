@@ -1,7 +1,7 @@
 <template>
   <div class="elements-container">
     <h1>Elements</h1>
-    <div class="element" v-for="element in elements" :key="element.title">
+    <div :class="element.class" v-for="element in elements" :key="element.title">
       <h4 class="element-text" v-on:load="first(element.msg)">{{element.title}}</h4>
       <h4 class="element-text number">{{element.amount}}</h4>
     </div>
@@ -40,5 +40,9 @@ export default {
   .number {
     position: absolute;
     right: 0;
+  }
+
+  .null {
+    display: none;
   }
 </style>

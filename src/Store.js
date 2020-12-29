@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
-        feed: ['You pop into existance. Everything is dark and cold.'],
+        feed: ['You pop into existence. Everything is dark and cold.'],
         Space: {
             'rotate': {
                 name: 'rotate',
@@ -14,9 +14,10 @@ const store = new Vuex.Store({
                 msg: 'Your wild rotation is attractive.',
                 click: function(name){
                     store.commit('exchange', name);
-                    store.commit('isMore')
+                    store.commit('isMore');
+                    store.commit('coolDown', name)
                 },
-                cooldown: 10,
+                cooldown: 1,
                 elemGain: 'particles',
                 elemLoss: 'particles',
                 price: 0,
@@ -30,11 +31,14 @@ const store = new Vuex.Store({
                 msg: 'While filtering particles you found something useful.',
                 click: function(name){
                     store.commit('exchange', name);
+                    store.commit('chooseAmount', ['hydrogen', 'carbon', 'oxygen']);
+                    store.commit('coolDown', name);
                 },
+                cooldown: 2,
                 elemGain: 'hydrogen',
                 elemLoss: 'particles',
                 price: 10,
-                income: 5
+                income: 0
             },
             'mass': {
                 name: 'mass',
@@ -49,38 +53,59 @@ const store = new Vuex.Store({
                 elemGain: 'mass',
                 elemLoss: 'particles',
                 price: 100,
-                income: 100
+                income: 1
             }
         },
         Elements: {
             'particles': {
                 title: 'Particles ',
+                class: 'null',
                 amount: 0,
                 msg: 'Particles make up everything, even you. You\'re going to want a lot'
             },
             'mass': {
                 title: 'Mass ',
+                class: 'null',
                 amount: 1,
                 msg: 'Mass is power and influance, collect more.'
             },
             'water': {
                 title: 'H2O ',
+                class: 'null',
                 amount: 0,
                 msg: 'Water gives life, and it isn\'t easy to come by.'
             },
             'hydrogen': {
                 title: 'H ',
+                class: 'null',
                 amount: 0,
                 msg: 'Hydrogen makes water and/or goes boom.'
             },
             'oxygen': {
                 title: 'O ',
+                class: 'null',
                 amount: 0,
                 msg: 'Oxygen allows life to keep living, and it makes water, so this is important stuff.'
+            },
+            'carbon': {
+                title: 'C ',
+                class: 'null',
+                amount: 0,
+                msg: 'Carbon is the building blaco of all life.'
             }
         }
     }, 
     mutations: {
+        chooseAmount (state, choices) {
+            choices.map(choice => {
+                let gain = state.Elements[choice];
+                let roll = Math.floor(Math.random()* 5)
+                if (roll > 0) {
+                    gain.class = 'element';
+                }
+                return gain.amount = gain.amount + roll;
+            })
+        },
         updateFeed (state, text) {
             state.feed.unshift(text);
             if (state.feed.length > 20) {
@@ -94,9 +119,10 @@ const store = new Vuex.Store({
             }
         },
         exchange (state, name) {
-            let button = state.Space[name]
-            let loss = state.Elements[button.elemLoss]
-            let gain = state.Elements[button.elemGain]
+            const button = state.Space[name]
+            const loss = state.Elements[button.elemLoss]
+            const gain = state.Elements[button.elemGain]
+            gain.class = 'element';
             if (loss.amount >= button.price){
                 loss.amount = loss.amount - button.price;
                 gain.amount = gain.amount + button.income;
@@ -108,13 +134,32 @@ const store = new Vuex.Store({
                 store.commit('updateFeed', ('Not enough, ' + loss.title))
             }
         },
+        coolDown (state, name) {
+            const button = state.Space[name];
+            const coolDown = document.getElementById(button.name + '-cool-down');
+            let timer = 100;
+            const originalFunction = button.click;
+            button.click = function() {
+                store.commit('updateFeed', 'Too hot, wait for cool down.')  
+            };
+
+            let cool = setInterval(function(){
+                if (timer <= 0) {
+                   clearInterval(cool);
+                   coolDown.style.width = 0;
+                   button.click = originalFunction;
+                } else {
+                    coolDown.style.width = timer + '%';
+                    timer -= 1;
+                }
+            }, 10 * button.cooldown)
+        },
         inflate (state, name) {
-            let button = state.Space[name]
+            const button = state.Space[name]
             button.price += button.inflation
-        }
-        ,
+        },
         deflate (state, {name, rate}) {
-            let button = state.Space[name]
+            const button = state.Space[name]
             button.price -= button.deflation * rate
         }
     }
