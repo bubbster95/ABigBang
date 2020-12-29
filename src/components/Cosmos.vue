@@ -1,8 +1,16 @@
 <template>
   <div class='cosmos-container'>
     <div class='nav'>
-        <router-link to="/space"><h1>Space</h1></router-link>
-        <router-link to="/planet"><h1>Planet</h1></router-link>
+
+        <router-link
+        v-for="link in links"
+        :key="link.inner"
+        :to="link.to"
+        :class="link.class"
+        >
+            <h1>{{link.inner}}</h1>
+        </router-link>
+
     </div>
     <router-view/>
   </div>
@@ -10,7 +18,12 @@
 
 <script>
 export default {
-  name: 'Playspace'
+  name: 'Playspace',
+  computed: {
+    links () {
+      return this.$store.state.Links
+    } 
+  }
 }
 </script>
 
@@ -22,5 +35,9 @@ export default {
     margin: 10px;
     display: inline-block;
     background-color: lightcoral;
+  }
+
+  .null {
+      display: none;
   }
 </style>

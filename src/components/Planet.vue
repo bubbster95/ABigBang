@@ -18,7 +18,7 @@
           v-on:click="click(button)"
         >{{button.title}}
         </button>
-        
+
       </div>
   </div>
 </template>
@@ -46,7 +46,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    margin: 10px;
+    margin: 20px 10px;
     display: inline-block;
   }
 

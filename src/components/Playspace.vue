@@ -7,6 +7,8 @@
           v-if='button.cooldown' 
           :class="button.class"
           v-on:click="click(button)"
+          @mouseover="toolTip(button)"
+          @mouseout="toolTipOff(button)"
         >{{button.title}}
         <div class='cool-down' :id='button.name + "-cool-down"'></div>
         </button>
@@ -16,9 +18,14 @@
           v-else
           :class="button.class"
           v-on:click="click(button)"
+          @mouseover="toolTip(button)"
+          @mouseout="toolTipOff(button)"
         >{{button.title}}
         </button>
-        
+
+        <!-- tool tip -->
+        <div class='tool-tip' :id='button.name + "-tool-tip"'></div>
+
       </div>
   </div>
 </template>
@@ -34,6 +41,22 @@ export default {
   methods: {
     click: function(button) {
       return button.click(button.name)
+    },
+    toolTip: (button) => {
+      const toolTip = document.getElementById(button.name + '-tool-tip')
+      toolTip.className = 'tool-tip'
+
+      toolTip.style.top = event.clientY - 30 + 'px';
+      toolTip.style.left = event.clientX - 300 + 'px';
+      if (button.price > 0) {
+        toolTip.innerHTML = button.elemLoss + '-' + button.price +'<br>'+ button.elemGain + '+' + button.income;
+      } else {
+        toolTip.innerHTML = button.elemGain + '+' + button.income;
+      }
+    },
+    toolTipOff: (button) => {
+      const toolTip = document.getElementById(button.name + '-tool-tip')
+      toolTip.className = 'null'
     }
   }
 }
@@ -46,7 +69,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    margin: 10px;
+    margin: 20px 10px;
     display: inline-block;
   }
 
@@ -73,5 +96,11 @@ export default {
     left: 0;
     height: 100%;
     background-color: rgba(255, 0, 0, .5);
+  }
+  .tool-tip{
+    position: absolute;
+    z-index: 1;
+    display: block;
+    background-color: burlywood;
   }
 </style>

@@ -6,39 +6,36 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state: {
         feed: ['You pop into existence. Everything is dark and cold.'],
+        Links: {
+            'space': {
+                to: "/space",
+                inner: 'Space',
+                class: 'link'
+            },
+            'planet': {
+                to: '/planet',
+                inner: 'Planet',
+                class: 'null'
+            }
+        },
         Space: {
             'rotate': {
                 name: 'rotate',
                 class: 'available',
                 title: 'Rotate wildly!',
                 msg: 'Your wild rotation is attractive.',
-                click: function(name){
+                click: (name) => {
                     store.commit('exchange', name);
                     store.commit('isMore');
                     store.commit('coolDown', name)
+                    store.commit('massIncreas', name)
                 },
                 cooldown: 1,
                 elemGain: 'particles',
                 elemLoss: 'particles',
                 price: 0,
-                income: 10
-            },
-            'sort': {
-                name: 'sort',
-                class: 'null',
-                title: 'Sort particles',
-                availableMsg: 'You can try organizing those particles? Might find something good.',
-                msg: 'While filtering particles you found something useful.',
-                click: function(name){
-                    store.commit('exchange', name);
-                    store.commit('chooseAmount', ['hydrogen', 'carbon', 'oxygen']);
-                    store.commit('coolDown', name);
-                },
-                cooldown: 2,
-                elemGain: 'hydrogen',
-                elemLoss: 'particles',
-                price: 10,
-                income: 0
+                income: 10,
+                initial: 10,
             },
             'mass': {
                 name: 'mass',
@@ -54,12 +51,10 @@ const store = new Vuex.Store({
                 elemLoss: 'particles',
                 price: 100,
                 income: 1
-            }
-        },
-        Planet: {
+            },
             'carbonMoon': {
                 name: 'carbonMoon',
-                class: 'available',
+                class: 'null',
                 title: 'Carbon Moon',
                 msg: 'A ball of carbon circles around you collecting carbon on your behalf.',
                 click: function(name){
@@ -73,6 +68,8 @@ const store = new Vuex.Store({
                 price: 1,
                 income: 100
             },
+        },
+        Planet: {
             'sort': {
                 name: 'sort',
                 class: 'null',
@@ -84,26 +81,11 @@ const store = new Vuex.Store({
                     store.commit('chooseAmount', ['hydrogen', 'carbon', 'oxygen']);
                     store.commit('coolDown', name);
                 },
-                cooldown: 2,
+                cooldown: 20,
                 elemGain: 'hydrogen',
                 elemLoss: 'particles',
                 price: 10,
                 income: 0
-            },
-            'mass': {
-                name: 'mass',
-                class: 'null',
-                title: 'Add Mass',
-                availableMsg: 'You have enough particles to generate mass, maybe try it out?',
-                msg: 'You committed some mass to your core, your influance can reach further.',
-                click: function(name){
-                    store.commit('exchange', name);
-                },
-                inflation: 50,
-                elemGain: 'mass',
-                elemLoss: 'particles',
-                price: 100,
-                income: 1
             }
         },
         Elements: {
@@ -146,6 +128,10 @@ const store = new Vuex.Store({
         }
     }, 
     mutations: {
+        massIncreas (state, name) {
+            let initial = state.Space[name].initial
+            state.Space[name].income = initial * state.Elements['mass'].amount
+        },
         chooseAmount (state, choices) {
             choices.map(choice => {
                 let gain = state.Elements[choice];
@@ -163,9 +149,13 @@ const store = new Vuex.Store({
             }
         },
         isMore (state) {
-            if (state.Elements['particles'].amount >= 50 && state.Space.sort.class === 'null') {
-                state.Space.sort.class = 'available';
+            if (state.Elements['particles'].amount >= 50 && state.Planet.sort.class === 'null') {
+                state.Planet.sort.class = 'available';
+                state.Links.planet.class = 'link';
+            } else if (state.Elements['particles'].amount >= 100 && state.Space.mass.class === 'null'){
                 state.Space.mass.class = 'available';
+            } else if (state.Elements['carbon'].amount >=50 && state.Space.carbon.class === 'null'){
+                state.Space.carbon.class = 'available';
             }
         },
         exchange (state, name) {
@@ -196,7 +186,7 @@ const store = new Vuex.Store({
             } else {
                 button = state.Space[name]
             }
-            const coolDown = document.getElementById(button.name + '-cool-down');
+            
             let timer = 100;
             const originalFunction = button.click;
             button.click = function() {
@@ -204,18 +194,24 @@ const store = new Vuex.Store({
             };
 
             let cool = setInterval(function(){
+                const coolDown = document.getElementById(button.name + '-cool-down');
                 if (timer <= 0) {
                    clearInterval(cool);
-                   coolDown.style.width = 0;
+                   if (coolDown){
+                    coolDown.style.width = 0;
+                   }
                    button.click = originalFunction;
                 } else {
-                    coolDown.style.width = timer + '%';
+                    if (coolDown) {
+                        coolDown.style.width = timer + '%';
+                    }
                     timer -= 1;
                 }
             }, 10 * button.cooldown)
         },
         inflate (state, name) {
             const button = state.Space[name]
+            console.log('inflate', button)
             button.price += button.inflation
         },
         deflate (state, {name, rate}) {
