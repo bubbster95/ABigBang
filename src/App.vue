@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Feed :feed="this.$store.state.feed"/>
-    <Cosmos/>
+    <Cosmos />
     <Elements :elements="this.$store.state.Elements"/>
   </div>
 </template>

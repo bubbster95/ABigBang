@@ -7,6 +7,8 @@
           v-if='button.cooldown' 
           :class="button.class"
           v-on:click="click(button)"
+          @mouseover="toolTip(button)"
+          @mouseout="toolTipOff(button)"
         >{{button.title}}
         <div class='cool-down' :id='button.name + "-cool-down"'></div>
         </button>
@@ -16,16 +18,22 @@
           v-else
           :class="button.class"
           v-on:click="click(button)"
+          @mouseover="toolTip(button)"
+          @mouseout="toolTipOff(button)"
         >{{button.title}}
         </button>
+
+        <!-- tool tip -->
+        <div v-if='!button.noTT' class='null' :id='button.name + "-tool-tip"'></div>
 
       </div>
   </div>
 </template>
 
 <script>
+import handle from '../Handler'
 export default {
-  name: 'Planet',
+  name: 'Playspace',
   computed: {
     buttons () {
       return this.$store.state.Planet
@@ -34,6 +42,12 @@ export default {
   methods: {
     click: function(button) {
       return button.click(button.name)
+    },
+    toolTip: (button) => {
+      return handle.state.toolTip(button)
+    },
+    toolTipOff: (button) => {
+      return handle.state.toolTipOff(button)
     }
   }
 }
@@ -73,5 +87,15 @@ export default {
     left: 0;
     height: 100%;
     background-color: rgba(255, 0, 0, .5);
+  }
+
+  .tool-tip{
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    z-index: 1;
+    padding: 5px;
+    display: block;
+    background-color: white;
   }
 </style>

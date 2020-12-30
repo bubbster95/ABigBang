@@ -24,13 +24,14 @@
         </button>
 
         <!-- tool tip -->
-        <div class='tool-tip' :id='button.name + "-tool-tip"'></div>
+        <div v-if='!button.noTT' class='null' :id='button.name + "-tool-tip"'></div>
 
       </div>
   </div>
 </template>
 
 <script>
+import handle from '../Handler'
 export default {
   name: 'Playspace',
   computed: {
@@ -43,20 +44,10 @@ export default {
       return button.click(button.name)
     },
     toolTip: (button) => {
-      const toolTip = document.getElementById(button.name + '-tool-tip')
-      toolTip.className = 'tool-tip'
-
-      toolTip.style.top = event.clientY - 30 + 'px';
-      toolTip.style.left = event.clientX - 300 + 'px';
-      if (button.price > 0) {
-        toolTip.innerHTML = button.elemLoss + '-' + button.price +'<br>'+ button.elemGain + '+' + button.income;
-      } else {
-        toolTip.innerHTML = button.elemGain + '+' + button.income;
-      }
+      return handle.state.toolTip(button)
     },
     toolTipOff: (button) => {
-      const toolTip = document.getElementById(button.name + '-tool-tip')
-      toolTip.className = 'null'
+      return handle.state.toolTipOff(button)
     }
   }
 }
@@ -78,6 +69,7 @@ export default {
   }
 
   .build-buttons {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 30%;
@@ -97,10 +89,14 @@ export default {
     height: 100%;
     background-color: rgba(255, 0, 0, .5);
   }
+
   .tool-tip{
     position: absolute;
+    top: 30px;
+    left: 20px;
     z-index: 1;
+    padding: 5px;
     display: block;
-    background-color: burlywood;
+    background-color: white;
   }
 </style>

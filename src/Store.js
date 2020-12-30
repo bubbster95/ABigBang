@@ -36,6 +36,7 @@ const store = new Vuex.Store({
                 price: 0,
                 income: 10,
                 initial: 10,
+                noTT: true
             },
             'mass': {
                 name: 'mass',
@@ -211,7 +212,6 @@ const store = new Vuex.Store({
         },
         inflate (state, name) {
             const button = state.Space[name]
-            console.log('inflate', button)
             button.price += button.inflation
         },
         deflate (state, {name, rate}) {

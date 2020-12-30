@@ -1,5 +1,4 @@
 import Vue from 'vue'
-// import store from './Store'
 import Router from 'vue-router'
 import Playspace from './components/Playspace.vue'
 import Planet from './components/Planet.vue'
