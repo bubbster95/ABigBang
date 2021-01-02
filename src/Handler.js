@@ -6,29 +6,27 @@ Vue.use(Vuex)
 const handle = new Vuex.Store({
     state: {
         toolTip: (button) => {
-        const toolTip = document.getElementById(button.name + '-tool-tip')
-        if (toolTip) {
-            toolTip.className = 'tool-tip'
+            const toolTip = document.getElementById(button.path + '-tool-tip')
+            if (toolTip) {
+                toolTip.className = 'tool-tip'
 
-            if (button.income == 0) {
-            toolTip.innerHTML = '-' + button.price + ' ' + button.elemLoss;
-            } else if (button.price > 0) {
-            toolTip.innerHTML = '-' + button.price + ' ' + button.elemLoss + '<br>' + '+' + button.income + ' ' + button.elemGain;
-            } else {
-            toolTip.innerHTML = '+' + button.income + ' ' + button.elemGain;
+                const gainKeys = Object.keys(button.gain);
+                const lossKeys = Object.keys(button.loss);
+
+                let tipText = '';
+                lossKeys.map(loss => {
+                    tipText += ('-' + button.loss[loss] + ' ' + loss) + '<br>'
+                });
+                gainKeys.map(gain => {
+                    tipText += ('+' + button.gain[gain] + ' ' + gain) + '<br>'
+                });
+                toolTip.innerHTML = tipText
             }
-        }
         },
         toolTipOff: (button) => {
-        if (document.getElementById(button.name + '-tool-tip')) {
-            document.getElementById(button.name + '-tool-tip').className = 'null';
-        }
-        }
-    },
-    mutations: {
-        massIncreas (state, name) {
-            let initial = state.Space[name].initial
-            state.Space[name].income = initial * state.Elements['mass'].amount
+            if (document.getElementById(button.path + '-tool-tip')) {
+                document.getElementById(button.path + '-tool-tip').className = 'null';
+            }
         }
     }
 })

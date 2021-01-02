@@ -19,74 +19,68 @@ const store = new Vuex.Store({
             }
         },
         Space: {
-            'rotate': {
-                name: 'rotate',
+            rotate: {
+                path: 'state.Space.rotate',
+                id: 'rotate',
                 class: 'available',
                 title: 'Rotate wildly!',
                 msg: 'Your wild rotation is attractive.',
-                click: (name) => {
-                    store.commit('exchange', name);
+                click: (path) => {
+                    store.commit('exchangeRate', path);
                     store.commit('isMore');
-                    store.commit('coolDown', name)
-                    store.commit('massIncreas', name)
+                    store.commit('coolDown', path);
                 },
                 cooldown: 1,
-                elemGain: 'particles',
-                elemLoss: 'particles',
-                price: 0,
-                income: 10,
-                initial: 10,
+                gain: {particles: 10},
+                loss: {particles: 0},
                 noTT: true
             },
-            'mass': {
-                name: 'mass',
+            mass: {
+                id: 'mass',
+                path: 'state.Space.mass',
                 class: 'null',
                 title: 'Add Mass',
                 availableMsg: 'You have enough particles to generate mass, maybe try it out?',
                 msg: 'You committed some mass to your core, your influance can reach further.',
-                click: function(name){
-                    store.commit('exchange', name);
+                click: function(path){
+                    store.commit('exchangeRate', path);
+                    store.commit('massIncreas');
                 },
                 inflation: 50,
-                elemGain: 'mass',
-                elemLoss: 'particles',
-                price: 100,
-                income: 1
+                gain: {mass: 1},
+                loss: {particles: 10}
             },
-            'carbonMoon': {
-                name: 'carbonMoon',
+            carbonMoon: {
+                id: 'carbonMoon',
+                path: 'state.Space.carbonMoon',
                 class: 'null',
                 title: 'Carbon Moon',
                 msg: 'A ball of carbon circles around you collecting carbon on your behalf.',
-                click: function(name){
-                    store.commit('exchange', name);
+                click: function(path){
+                    store.commit('exchangeRate', path);
                     store.commit('isMore');
-                    store.commit('coolDown', name)
+                    store.commit('coolDown', path)
                 },
-                cooldown: 30,
-                elemGain: 'carbon',
-                elemLoss: 'mass',
-                price: 1,
-                income: 100
+                gain: {carbon: 10},
+                loss: {mass: 1, carbon: 10}
             },
         },
         Planet: {
-            'sort': {
-                name: 'sort',
+            sort: {
+                id: 'sort',
+                path: 'state.Planet.sort',
                 class: 'null',
                 title: 'Sort particles',
                 availableMsg: 'You can try organizing those particles? Might find something good.',
                 msg: 'While filtering particles you found something useful.',
-                click: function(name){
-                    store.commit('exchange', name);
+                click: function(path){
+                    store.commit('exchangeRate', path);
                     store.commit('chooseAmount', ['hydrogen', 'carbon', 'oxygen']);
-                    store.commit('coolDown', name);
+                    store.commit('coolDown', path);
                 },
-                cooldown: 20,
-                elemGain: 'hydrogen',
-                elemLoss: 'particles',
-                price: 10,
-                income: 0
+                cooldown: 0,
+                gain: {hydrogen: 0},
+                loss: {particles: 10}
             }
         },
         Elements: {
@@ -124,14 +118,13 @@ const store = new Vuex.Store({
                 title: 'C ',
                 class: 'null',
                 amount: 0,
-                msg: 'Carbon is the building blaco of all life.'
+                msg: 'Carbon is the building block of all life.'
             }
         }
     }, 
     mutations: {
-        massIncreas (state, name) {
-            let initial = state.Space[name].initial
-            state.Space[name].income = initial * state.Elements['mass'].amount
+        massIncreas (state) {
+            state.Space['rotate'].gain['particles'] = 10 * state.Elements['mass'].amount;
         },
         chooseAmount (state, choices) {
             choices.map(choice => {
@@ -140,7 +133,7 @@ const store = new Vuex.Store({
                 if (roll > 0) {
                     gain.class = 'element';
                 }
-                return gain.amount = gain.amount + roll;
+                return gain.amount += roll;
             })
         },
         updateFeed (state, text) {
@@ -150,42 +143,60 @@ const store = new Vuex.Store({
             }
         },
         isMore (state) {
-            if (state.Elements['particles'].amount >= 50 && state.Planet.sort.class === 'null') {
+            if (state.Elements['particles'].amount >= 0 && state.Planet.sort.class === 'null') {
                 state.Planet.sort.class = 'available';
                 state.Links.planet.class = 'link';
             } else if (state.Elements['particles'].amount >= 100 && state.Space.mass.class === 'null'){
                 state.Space.mass.class = 'available';
-            } else if (state.Elements['carbon'].amount >=50 && state.Space.carbon.class === 'null'){
-                state.Space.carbon.class = 'available';
+            } else if (state.Elements['carbon'].amount >=5 && state.Space.carbonMoon.class === 'null'){
+                state.Space.carbonMoon.class = 'available';
             }
         },
-        exchange (state, name) {
+        exchangeRate (state, path) {
             let button;
-            if (state.Planet[name]) {
-                button = state.Planet[name]
+            if (state.Planet[path]) {
+                button = state.Planet[path]
             } else {
-                button = state.Space[name]
+                button = state.Space[path]
             }
-            const loss = state.Elements[button.elemLoss]
-            const gain = state.Elements[button.elemGain]
-            gain.class = 'element';
-            if (loss.amount >= button.price){
-                loss.amount = loss.amount - button.price;
-                gain.amount = gain.amount + button.income;
+
+            const losses = button.loss;
+            const gains = button.gain;
+            
+            const lossKeys = Object.keys(losses);
+            const gainKeys = Object.keys(gains);
+
+            let sufficientFunds = true;
+
+            lossKeys.map(loss => {
+                if (state.Elements[loss].amount < losses[loss]) {
+                    store.commit('updateFeed', ('Not enough, ' + loss + '.'))
+                    sufficientFunds = false
+                } 
+            });
+
+            if (sufficientFunds == true) {
+                lossKeys.map(loss => {
+                    state.Elements[loss].amount -= losses[loss]
+                    if (button.inflation) {
+                        store.commit('inflate', {path, loss})
+                    }
+                }); 
+                gainKeys.map(gain => {
+                    state.Elements[gain].amount += gains[gain]
+
+                    // If element hasen't become visible yet
+                    state.Elements[gain].class = 'element'
+                });
                 store.commit('updateFeed', button.msg);
-                if (button.inflation) {
-                    store.commit('inflate', name)
-                }
-            } else {
-                store.commit('updateFeed', ('Not enough, ' + loss.title))
             }
         },
-        coolDown (state, name) {
+        coolDown (state, path) {
             let button;
-            if (state.Planet[name]) {
-                button = state.Planet[name]
+            if (state.Planet[path]) {
+                button = state.Planet[path]
             } else {
-                button = state.Space[name]
+                button = state.Space[path]
             }
             
             let timer = 100;
@@ -195,7 +206,7 @@ const store = new Vuex.Store({
             };
 
             let cool = setInterval(function(){
-                const coolDown = document.getElementById(button.name + '-cool-down');
+                const coolDown = document.getElementById(button.path + '-cool-down');
                 if (timer <= 0) {
                    clearInterval(cool);
                    if (coolDown){
@@ -210,13 +221,13 @@ const store = new Vuex.Store({
                 }
             }, 10 * button.cooldown)
         },
-        inflate (state, name) {
-            const button = state.Space[name]
-            button.price += button.inflation
+        inflate (state, {path, loss}) {
+            const button = state.Space[path]
+            button.loss[loss] += button.inflation
         },
-        deflate (state, {name, rate}) {
-            const button = state.Space[name]
-            button.price -= button.deflation * rate
+        deflate (state, {path, rate}) {
+            const button = state.Space[path]
+            button.loss[0] -= button.deflation * rate
         }
     }
 })

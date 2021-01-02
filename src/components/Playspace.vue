@@ -10,7 +10,7 @@
           @mouseover="toolTip(button)"
           @mouseout="toolTipOff(button)"
         >{{button.title}}
-        <div class='cool-down' :id='button.name + "-cool-down"'></div>
+        <div class='cool-down' :id='button.id + "-cool-down"'></div>
         </button>
 
         <!-- regular buttons -->
@@ -24,7 +24,7 @@
         </button>
 
         <!-- tool tip -->
-        <div v-if='!button.noTT' class='null' :id='button.name + "-tool-tip"'></div>
+        <div v-if='!button.noTT' class='null' :id='button.id + "-tool-tip"'></div>
 
       </div>
   </div>
@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     click: function(button) {
-      return button.click(button.name)
+      return button.click(button.id)
     },
     toolTip: (button) => {
       return handle.state.toolTip(button)

@@ -2,7 +2,7 @@
   <div class="elements-container">
     <h1>Elements</h1>
     <div :class="element.class" v-for="element in elements" :key="element.title">
-      <h4 class="element-text" v-on:load="first(element.msg)">{{element.title}}</h4>
+      <h4 class="element-text">{{element.title}}</h4>
       <h4 class="element-text number">{{element.amount}}</h4>
     </div>
   </div>
