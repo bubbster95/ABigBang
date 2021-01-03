@@ -1,22 +1,29 @@
 <template>
-  <div class='planet-container'>
-    <button id="sort" class="available" @click="clickEvent($event)" title="tool tip">
-        Sort particles
-        <div class='cool-down' id='sort-cool-down'></div>
+  <div class='space-container'>
+    <button id="rotate" class="available" @click="clickEvent($event)" title="tool tip">
+        Rotate wildly!
+        <div class='cool-down' id='rotate-cool-down'></div>
+    </button>
+
+    <button v-if="Elements.particles.amount >= 50" id="mass" @click="clickEvent($event)" title="tool tip">
+      Add mass
+    </button>
+
+    <button v-if="Elements.carbon.amount >= 10" id="carbonMoon" @click="clickEvent($event)" title="tool tip">
+      Carbon moon
     </button>
   </div>
 </template>
 
 <script>
-// import store from '../Store'
 export default {
-  name: 'Planet',
-  props: ['clickEvent']
+  name: 'Space',
+  props: ['clickEvent', 'Elements']
 }
 </script>
 
 <style scoped>
-  .planet-container {
+  .space-container {
     position: absolute;
     top: 0;
     left: 0;
