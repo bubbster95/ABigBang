@@ -1,6 +1,6 @@
 <template>
   <div class='planet-container'>
-    <button id="sort" class="available" @click="clickEvent($event)" title="tool tip">
+    <button id="sort" class="available" @click="clickEvent('sort')" title="tool tip">
         Sort particles
         <div class='cool-down' id='sort-cool-down'></div>
     </button>

@@ -1,15 +1,15 @@
 <template>
   <div class='space-container'>
-    <button id="rotate" class="available" @click="clickEvent($event)" title="tool tip">
+    <button id="rotate" class="available" @click="clickEvent('rotate')" :title="toolTip('rotate')">
         Rotate wildly!
         <div class='cool-down' id='rotate-cool-down'></div>
     </button>
 
-    <button v-if="Elements.particles.amount >= 50" id="mass" @click="clickEvent($event)" title="tool tip">
+    <button v-if="Elements.particles.amount >= 50" id="mass" @click="clickEvent('mass')" :title="toolTip('mass')">
       Add mass
     </button>
 
-    <button v-if="Elements.carbon.amount >= 10" id="carbonMoon" @click="clickEvent($event)" title="tool tip">
+    <button v-if="Elements.carbon.amount >= 10" id="carbonMoon" @click="clickEvent('carbonMoon')" :title="toolTip('carbonMoon')">
       Carbon moon
     </button>
   </div>
@@ -18,7 +18,7 @@
 <script>
 export default {
   name: 'Space',
-  props: ['clickEvent', 'Elements']
+  props: ['clickEvent', 'Elements', 'toolTip']
 }
 </script>
 

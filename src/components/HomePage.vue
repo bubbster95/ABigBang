@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <Feed :feed="feed"/>
-        <Cosmos :clickEvent="clickEvent" :Elements="Elements"/>
+        <Cosmos :Elements="Elements" :Feed="feed"/>
         <Elements :elements="Elements"/>
     </div>
 </template>
@@ -16,33 +16,6 @@ export default {
   data() {
         return {
             feed: ['You pop into existence. Everything is dark and cold.'],
-            buttons: {
-                rotate: {
-                    msg: 'Your wild rotation is attractive.',
-                    cooldown: 1,
-                    gain: {particles: 10},
-                    loss: {particles: 0},
-                },
-                mass: {
-                    msg: 'You committed some mass to your core, your influance can reach further.',
-                    otherFunctions: [this.massIncreas, this.diceRoll], 
-                    inflation: 50,
-                    gain: {mass: 1},
-                    loss: {particles: 100}
-                },
-                carbonMoon: {
-                    msg: 'A ball of carbon circles around you collecting carbon on your behalf.',
-                    gain: {carbon: 10},
-                    loss: {mass: 1, carbon: 10}
-                },
-                sort: {
-                    availableMsg: 'You can try organizing those particles? Might find something good.',
-                    msg: 'While filtering particles you found something useful.',
-                    cooldown: 5,
-                    gain: {hydrogen: Math.floor(Math.random()*5), carbon: Math.floor(Math.random()*5), oxygen: Math.floor(Math.random()*5)},
-                    loss: {particles: 10}
-                },
-            },
             Elements: {
                 'particles': {
                     title: 'Particles ',
@@ -81,88 +54,6 @@ export default {
                     msg: 'Carbon is the building block of all life.'
                 }
             } 
-        }
-    },
-    methods: {
-        clickEvent: function(event) {
-            let button = event.target.id
-            let buttonInfo = this.buttons[button]
-            this.exchangeRate(button);
-            this.coolDown(button);
-            if (buttonInfo.otherFunctions) {
-                buttonInfo.otherFunctions.map(thisFunction => {  
-                    thisFunction()
-                })
-            }
-        },
-        massIncreas: function() {
-            this.buttons['rotate'].gain['particles'] = 10 * this.Elements['mass'].amount;
-        },
-        diceRoll: function(max) {
-            Math.floor(Math.random()* max)
-        },
-        updateFeed: function(text) {
-            this.feed.unshift(text);
-            if (this.feed.length > 20) {
-                this.feed.pop();
-            }
-        },
-        exchangeRate: function(name) {
-            let button = this.buttons[name]
-            const losses = button.loss;
-            const gains = button.gain;
-            
-            const lossKeys = Object.keys(losses);
-            const gainKeys = Object.keys(gains);
-
-            let sufficientFunds = true;
-
-            lossKeys.map(loss => {
-                if (this.Elements[loss].amount < losses[loss]) {
-                    this.updateFeed('Not enough, ' + loss + '.')
-                    sufficientFunds = false
-                } 
-            });
-
-            if (sufficientFunds == true) {
-                lossKeys.map(loss => {
-                    this.Elements[loss].amount -= losses[loss]
-                    if (button.inflation) {
-                        this.inflate(name, loss)
-                    }
-                }); 
-                gainKeys.map(gain => {
-                    this.Elements[gain].amount += gains[gain]
-
-                    // If element hasen't become visible yet
-                    this.Elements[gain].class = 'element'
-                });
-                this.updateFeed(button.msg);
-            }
-        },
-        coolDown: function(name) {
-            let button = this.buttons[name]
-            
-            let timer = 100;
-
-            let cool = setInterval(function(){
-                const coolDown = document.getElementById(name + '-cool-down');
-                if (timer <= 0) {
-                   clearInterval(cool);
-                   if (coolDown){
-                    coolDown.style.width = 0;
-                   }
-                } else {
-                    if (coolDown) {
-                        coolDown.style.width = timer + '%';
-                    }
-                    timer -= 1;
-                }
-            }, 10 * button.cooldown)
-        },
-        inflate: function(name, loss) {
-            const button = this.buttons[name]
-            button.loss[loss] += button.inflation
         }
     },
     components: {
