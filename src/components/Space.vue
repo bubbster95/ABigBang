@@ -1,24 +1,47 @@
 <template>
   <div class='space-container'>
-    <button id="rotate" class="available" @click="clickEvent('rotate')" :title="toolTip('rotate')">
-        Rotate wildly!
-        <div class='cool-down' id='rotate-cool-down'></div>
-    </button>
+    <div class="build-buttons">
+      <button
+      v-if="data.makeAvailable('availableButtons', 'rotate', true)"
+      id="rotate"
+      class="available"
+      @click="data.clickEvent('rotate')"
+      :title="data.toolTip('rotate')">
+          Rotate wildly!
+          <div class='cool-down' id='rotate-cool-down'></div>
+      </button>
 
-    <button v-if="Elements.particles.amount >= 50" id="mass" @click="clickEvent('mass')" :title="toolTip('mass')">
-      Add mass
-    </button>
+      <button
+      v-if="data.makeAvailable('availableButtons', 'sorter', Elements.particles.amount >= 50)"
+      id="sorter"
+      @click="data.clickEvent('sorter')"
+      :title="data.toolTip('sorter')">
+        Create sorter
+      </button>
 
-    <button v-if="Elements.carbon.amount >= 10" id="carbonMoon" @click="clickEvent('carbonMoon')" :title="toolTip('carbonMoon')">
-      Carbon moon
-    </button>
+      <button
+      v-if="data.makeAvailable('availableButtons', 'mass', Elements.particles.amount >= 50)"
+      id="mass"
+      @click="data.clickEvent('mass')"
+      :title="data.toolTip('mass')">
+        Add mass
+      </button>
+
+      <button
+      v-if="data.makeAvailable('availableButtons', 'carbonMoon', data.upgrades.sorter >= 1)"
+      id="carbonMoon"
+      @click="data.clickEvent('carbonMoon')"
+      :title="data.toolTip('carbonMoon')">
+        Carbon moon
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Space',
-  props: ['clickEvent', 'Elements', 'toolTip']
+  props: ['data', 'Elements']
 }
 </script>
 
@@ -30,11 +53,6 @@ export default {
     width: 100%;
     height: 100%;
     margin: 20px 10px;
-    display: inline-block;
-  }
-
-  .null {
-    display: none;
   }
 
   .build-buttons {
@@ -45,7 +63,7 @@ export default {
     margin: 0px 10px;
   }
 
-  .available, .cooling {
+  .cooling, button {
     position: relative;
     margin: 5px;
   }

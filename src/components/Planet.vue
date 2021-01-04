@@ -1,9 +1,33 @@
 <template>
   <div class='planet-container'>
-    <button id="sort" class="available" @click="clickEvent('sort')" title="tool tip">
+
+    <div class="cool-down-buttons">
+      <button
+        v-if="data.makeAvailable('availableButtons', 'rotate', data.upgrades.sorter >= 1)"
+        id="sort"
+        @click="data.clickEvent('sort')"
+        :title="data.toolTip('sort')"
+      >
         Sort particles
         <div class='cool-down' id='sort-cool-down'></div>
-    </button>
+      </button>
+    </div>
+
+    <div v-if="data.makeAvailable('availableButtons', 'carbonManager', data.moons.cMoon >= 1)" class="carbon-manager">
+      <button
+        id="add"
+        @click="data.clickEvent('add', 'cMoon')"
+        :title="data.toolTip('add')"
+      >
+        ^
+      </button>
+
+      <button
+        id="subtract"
+        @click="data.clickEvent('subtract', 'cMoon')"
+        :title="data.toolTip('subtract')"
+      >v</button>
+    </div>
   </div>
 </template>
 
@@ -11,7 +35,7 @@
 // import store from '../Store'
 export default {
   name: 'Planet',
-  props: ['clickEvent']
+  props: ['data']
 }
 </script>
 
@@ -26,11 +50,7 @@ export default {
     display: inline-block;
   }
 
-  .null {
-    display: none;
-  }
-
-  .build-buttons {
+  .cool-down-buttons {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -38,7 +58,7 @@ export default {
     margin: 0px 10px;
   }
 
-  .available, .cooling {
+  .cooling, button {
     position: relative;
     margin: 5px;
   }
