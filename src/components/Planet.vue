@@ -11,19 +11,26 @@
         Sort particles
         <div class='cool-down' id='sort-cool-down'></div>
       </button>
+
+      <h4>Mass: </h4>
+      <h4>{{Elements.mass.amount}}</h4>
     </div>
 
-    <div v-if="data.makeAvailable('availableButtons', 'carbonManager', data.moons.cMoon >= 1)" class="carbon-manager">
+    <div
+    v-if="data.makeAvailable('availableButtons', 'carbonManager', data.moons.cMoon >= 1)"
+    id="carbon-manager"
+    class="manager">
+      <h4>Carbon moon</h4>
       <button
-        id="add"
+        class="add"
         @click="data.clickEvent('add', 'cMoon')"
         :title="data.toolTip('add')"
       >
         ^
       </button>
-
+      <h4>{{data.moons.cMoon}}</h4>
       <button
-        id="subtract"
+        class="subtract"
         @click="data.clickEvent('subtract', 'cMoon')"
         :title="data.toolTip('subtract')"
       >v</button>
@@ -35,7 +42,7 @@
 // import store from '../Store'
 export default {
   name: 'Planet',
-  props: ['data']
+  props: ['data', 'Elements']
 }
 </script>
 
@@ -53,9 +60,9 @@ export default {
   .cool-down-buttons {
     position: relative;
     display: flex;
-    flex-direction: column;
-    width: 30%;
-    margin: 0px 10px;
+    width: 80%;
+    justify-content: center;
+    align-items: center;
   }
 
   .cooling, button {
@@ -70,6 +77,19 @@ export default {
     left: 0;
     height: 100%;
     background-color: rgba(255, 0, 0, .5);
+  }
+
+  .manager {
+    position: relative;
+    display: flex;
+    background-color: aquamarine;
+    width: 90%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .add, .subtract {
+    height: 50%;
   }
 
   .tool-tip{
