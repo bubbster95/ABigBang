@@ -13,11 +13,11 @@
       </button>
 
       <h4>Mass: </h4>
-      <h4>{{Elements.mass.amount}}</h4>
+      <h4>{{data.moons.mass.amount}}</h4>
     </div>
 
     <div
-    v-if="data.makeAvailable('availableButtons', 'carbonManager', data.moons.cMoon >= 1)"
+    v-if="data.makeAvailable('availableButtons', 'carbonManager', data.moons.cMoon.amount >= 1)"
     id="carbon-manager"
     class="manager">
       <h4>Carbon moon</h4>
@@ -28,7 +28,7 @@
       >
         ^
       </button>
-      <h4>{{data.moons.cMoon}}</h4>
+      <h4>{{data.moons.cMoon.amount}}</h4>
       <button
         class="subtract"
         @click="data.clickEvent('subtract', 'cMoon')"

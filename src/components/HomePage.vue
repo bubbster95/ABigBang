@@ -23,12 +23,6 @@ export default {
                     amount: 0,
                     msg: 'Particles make up everything, even you. You\'re going to want a lot'
                 },
-                'mass': {
-                    title: 'Mass ',
-                    class: 'null',
-                    amount: 1,
-                    msg: 'Mass is power and influance, collect more.'
-                },
                 'water': {
                     title: 'H2O ',
                     class: 'null',
@@ -53,7 +47,7 @@ export default {
                     amount: 0,
                     msg: 'Carbon is the building block of all life.'
                 }
-            } 
+            }
         }
     },
     components: {

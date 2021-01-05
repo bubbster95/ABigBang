@@ -2,14 +2,18 @@
   <div class='cosmos-container'>
     <div class='nav'>
       <h1 @click="switchTabs('space')">Space</h1>
-      <h1 v-if="makeAvailable('availableTab', 'planet', this.upgrades.sorter >= 1)" @click="switchTabs('planet')">Planet</h1>
+      <h1 v-if="makeAvailable('availableTab', 'planet', this.upgrades.sorter.amount >= 1)" @click="switchTabs('planet')">Planet</h1>
       <Space
-      v-if="this.visibleTab.space==true"
-      :data="this" :Elements="Elements"/>
+        v-show="this.visibleTab.space==true"
+        :data="this"
+        :Elements="Elements"
+      />
       
       <Planet
-      v-if="this.visibleTab.planet==true"
-      :data="this" :Elements="Elements"/>
+        v-show="this.visibleTab.planet==true"
+        :data="this"
+        :Elements="Elements"
+      />
     </div>
   </div>
 </template>
@@ -22,6 +26,8 @@ export default {
   props: ['Elements', 'Feed'],
   data: () => {
     return {
+      second: 0,
+      int: null,
       buttons: {
         rotate: {
           msg: 'Your wild rotation is attractive.',
@@ -32,7 +38,7 @@ export default {
         },
         sorter: {
           msg: 'You\'ve got a lot on your plate, so you create a way to organize some particles.',
-          // otherFunctions: ['massIncreas'],
+          // otherFunctions: ['startCount'],
           inflation: 50,
           gain: {sorter: 1},
           loss: {particles: 50}
@@ -42,7 +48,7 @@ export default {
           msg: 'While filtering particles you found something useful.',
           cooldown: 5,
           available: true,
-          gain: {hydrogen: 10, carbon: 10, oxygen: 10},
+          gain: {particles: 0},
           loss: {particles: 10}
         },
         mass: {
@@ -54,6 +60,7 @@ export default {
         },
         carbonMoon: {
           msg: 'A ball of carbon circles around you collecting carbon on your behalf.',
+          otherFunctions: ['startCount'],
           gain: {cMoon: 1},
           loss: {mass: 1, carbon: 20}
         },
@@ -86,14 +93,47 @@ export default {
 
       },
       upgrades: {
-        sorter: 0
+        sorter: {
+          amount: 0,
+          gain: {carbon: 5, hydrogen: 5, oxygen: 5},
+          loss: {particles: 0}
+        }
       },
       moons: {
-        cMoon: 0
+        'mass': {
+            amount: 1,
+            gain: {particles: 10},
+            loss: {particles: 0}
+        },
+        cMoon: {
+          amount: 0,
+          gain: {carbon: 10},
+          loss: {particles: 0}
+        },
+        hMoon: {
+          amount: 0,
+          gain: {hydrogen: 10},
+          loss: {particles: 0}
+        }
       }
     }
   },
+  created() { 
+      this.startCount()
+  },
   methods: {
+    startCount() {
+      this.int = setInterval(this.count, 1000);
+    },
+    count() {
+      this.second++;
+      if (this.second >= 10) {
+      this.second = 0;
+      this.exchangeRate('cMoon', true)
+      this.exchangeRate('mass', true)
+
+      }
+    },
     clickEvent: function(name) {
       let button = this.buttons[name]
 
@@ -101,7 +141,6 @@ export default {
         this.updateFeed('Too hot, wait for cool down');
       } else {
         this.exchangeRate(name);
-        this.coolDown(name);
         
         if (button.otherFunctions) {
           button.otherFunctions.map(thisFunction => {  
@@ -133,7 +172,7 @@ export default {
       return tipText
     },
     massIncreas: function() {
-      this.buttons['rotate'].gain['particles'] = 10 * this.Elements['mass'].amount;
+      this.buttons['rotate'].gain['particles'] = 10 * this.moons['mass'].amount;
     },
     updateFeed: function(text) {
       this.Feed.unshift(text);
@@ -141,10 +180,23 @@ export default {
           this.Feed.pop();
       }
     },
-    exchangeRate: function(name) {
-      let button = this.buttons[name]
-      const losses = button.loss;
-      const gains = button.gain;
+    exchangeRate: function(name, moon) {
+      let trade;
+      if (name == 'sort') {
+        let exchange = {};
+        exchange.hydrogen = Math.floor(Math.random() * (this.upgrades.sorter.amount * 10))
+        exchange.oxygen = Math.floor(Math.random() * (this.upgrades.sorter.amount * 15))
+        exchange.carbon = Math.floor(Math.random() * (this.upgrades.sorter.amount * 5))
+        this.buttons[name].gain = exchange
+        trade = this.buttons[name]
+      } else if (moon) {
+          trade = this.moons[name];
+      } else {
+          trade = this.buttons[name];
+      }
+
+      const losses = trade.loss;
+      const gains = trade.gain;
       
       const lossKeys = Object.keys(losses);
       const gainKeys = Object.keys(gains);
@@ -153,9 +205,8 @@ export default {
       
 
       lossKeys.map(loss => {
-        console.log('loss',loss)
         if (!this.Elements[loss]) {
-          if(this.moons[loss] == 1) { 
+          if(this.moons[loss].amount == 1) { 
             this.updateFeed('You should not destroy your' + loss + '.')
             sufficientFunds = false
           } 
@@ -166,28 +217,31 @@ export default {
       });
 
       if (sufficientFunds == true) {
+        if (trade.cooldown) {
+          this.coolDown(name);
+        }
         lossKeys.map(loss => {
           if (!this.Elements[loss]) {
-            if(this.moons[loss] || this.moons[loss] == 0) {
-              this.moons[loss] -= losses[loss]
+            if(this.moons[loss].amount || this.moons[loss].amount == 0) {
+              this.moons[loss].amount -= losses[loss]
             } 
           } else {
             this.Elements[loss].amount -= losses[loss]
-            if (button.inflation) {
+            if (trade.inflation) {
               this.inflate(name, loss)
             }
           }
         }); 
 
         gainKeys.map(gain => {
+          if (moon) {
+            return this.Elements[gain].amount += gains[gain] * trade.amount
+          }
           if (!this.Elements[gain]) {
-
             if (this.moons[gain] || this.moons[gain] == 0){
-              this.moons[gain] += gains[gain]
-              console.log('if', gain, this.moons[gain])
+              this.moons[gain].amount += gains[gain]
             } else {
-              this.upgrades[gain] += gains[gain]
-              console.log('else', gain, this.upgrades[gain])
+              this.upgrades[gain].amount += gains[gain]
             }
 
           } else {
@@ -197,7 +251,9 @@ export default {
             this.Elements[gain].class = 'element'
           }
         });
-        this.updateFeed(button.msg);
+        if (trade.msg) {
+          this.updateFeed(trade.msg);
+        }
       }
     },
     coolDown: function(name) {

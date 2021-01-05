@@ -28,7 +28,7 @@
       </button>
 
       <button
-      v-if="data.makeAvailable('availableButtons', 'carbonMoon', data.upgrades.sorter >= 1)"
+      v-if="data.makeAvailable('availableButtons', 'carbonMoon', data.upgrades.sorter.amount >= 1)"
       id="carbonMoon"
       @click="data.clickEvent('carbonMoon')"
       :title="data.toolTip('carbonMoon')">
