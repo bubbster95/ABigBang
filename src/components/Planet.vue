@@ -78,6 +78,15 @@ export default {
     height: 100%;
     background-color: rgba(255, 0, 0, .5);
   }
+   .start-cool {
+    animation: coolDown;
+    animation-timing-function: linear;
+  }
+
+  @keyframes coolDown {
+    0% {width: 100%;}
+    100% {width: 0px;}
+  }
 
   .manager {
     position: relative;

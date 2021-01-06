@@ -4,13 +4,13 @@
       <h1 @click="switchTabs('space')">Space</h1>
       <h1 v-if="makeAvailable('availableTab', 'planet', this.upgrades.sorter.amount >= 1)" @click="switchTabs('planet')">Planet</h1>
       <Space
-        v-show="this.visibleTab.space==true"
+        v-hide="this.visibleTab.space"
         :data="this"
         :Elements="Elements"
       />
       
       <Planet
-        v-show="this.visibleTab.planet==true"
+        v-hide="this.visibleTab.planet"
         :data="this"
         :Elements="Elements"
       />
@@ -23,6 +23,25 @@ import Space from './Space'
 import Planet from './Planet'
 export default {
   name: 'Cosmos',
+  directives: {
+    hide: {
+      inserted: function(el, binding) {
+        if (binding.value == false){
+        el.style.position = 'absolute';
+        el.style.left = '9000px';
+        }
+      },
+      update: function(el, binding) {
+        if (binding.value == false){
+        el.style.position = 'absolute';
+        el.style.left = '9000px';
+        } else {
+        el.style.position = 'relative';
+        el.style.left = '0px';
+        }
+      } 
+    }
+  },
   props: ['Elements', 'Feed'],
   data: () => {
     return {
@@ -31,8 +50,8 @@ export default {
       buttons: {
         rotate: {
           msg: 'Your wild rotation is attractive.',
-          // cooldown: 1,
-          // available: true,
+          cooldown: 1,
+          available: true,
           gain: {particles: 10},
           loss: {particles: 0},
         },
@@ -129,8 +148,8 @@ export default {
       this.second++;
       if (this.second >= 10) {
       this.second = 0;
-      this.exchangeRate('cMoon', true)
-      this.exchangeRate('mass', true)
+      this.exchangeRate('cMoon', 'moon')
+      this.exchangeRate('mass', 'moon')
 
       }
     },
@@ -180,19 +199,19 @@ export default {
           this.Feed.pop();
       }
     },
-    exchangeRate: function(name, moon) {
+    exchangeRate: function(name, type) {
       let trade;
       if (name == 'sort') {
         let exchange = {};
-        exchange.hydrogen = Math.floor(Math.random() * (this.upgrades.sorter.amount * 10))
-        exchange.oxygen = Math.floor(Math.random() * (this.upgrades.sorter.amount * 15))
-        exchange.carbon = Math.floor(Math.random() * (this.upgrades.sorter.amount * 5))
-        this.buttons[name].gain = exchange
-        trade = this.buttons[name]
-      } else if (moon) {
-          trade = this.moons[name];
+        exchange.carbon = Math.floor(Math.random() * (this.upgrades.sorter.amount * 5));
+        exchange.hydrogen = Math.floor(Math.random() * (this.upgrades.sorter.amount * 10));
+        exchange.oxygen = Math.floor(Math.random() * (this.upgrades.sorter.amount * 15));
+        this.buttons[name].gain = exchange;
+        trade = this.buttons[name];
+      } else if (type === 'moon') {
+        trade = this.moons[name];
       } else {
-          trade = this.buttons[name];
+        trade = this.buttons[name];
       }
 
       const losses = trade.loss;
@@ -202,12 +221,11 @@ export default {
       const gainKeys = Object.keys(gains);
 
       let sufficientFunds = true;
-      
-
+      // Are there enough funds? If not this code will catch it.
       lossKeys.map(loss => {
         if (!this.Elements[loss]) {
           if(this.moons[loss].amount == 1) { 
-            this.updateFeed('You should not destroy your' + loss + '.')
+            this.updateFeed('You should not destroy your ' + loss + '.')
             sufficientFunds = false
           } 
         } else if (this.Elements[loss].amount < losses[loss]) {
@@ -216,10 +234,14 @@ export default {
         } 
       });
 
+      // This block subtracts funds according to price of items bought
+      // Then adds funds according to users purchase
       if (sufficientFunds == true) {
+        // starts coolDown
         if (trade.cooldown) {
           this.coolDown(name);
         }
+        // Subtracting
         lossKeys.map(loss => {
           if (!this.Elements[loss]) {
             if(this.moons[loss].amount || this.moons[loss].amount == 0) {
@@ -232,24 +254,17 @@ export default {
             }
           }
         }); 
-
+        // Adding
         gainKeys.map(gain => {
-          if (moon) {
-            return this.Elements[gain].amount += gains[gain] * trade.amount
-          }
-          if (!this.Elements[gain]) {
-            if (this.moons[gain] || this.moons[gain] == 0){
-              this.moons[gain].amount += gains[gain]
-            } else {
-              this.upgrades[gain].amount += gains[gain]
-            }
-
-          } else {
-            this.Elements[gain].amount += gains[gain]
-
-            // If element hasen't become visible yet
-            this.Elements[gain].class = 'element'
-          }
+          return (type === 'moon') ?
+          this.Elements[gain].amount += gains[gain] * trade.amount :
+            (!this.Elements[gain]) ?
+              (this.moons[gain] || this.moons[gain] == 0) ?
+                this.moons[gain].amount += gains[gain] :
+                this.upgrades[gain].amount += gains[gain] :
+                
+              (this.Elements[gain].amount += gains[gain]) &&
+              (this.Elements[gain].class = 'element')
         });
         if (trade.msg) {
           this.updateFeed(trade.msg);
@@ -257,25 +272,17 @@ export default {
       }
     },
     coolDown: function(name) {
-      let button = this.buttons[name];
+      const button = this.buttons[name];
       button.available = false;
-      let timer = 100;
 
-      let cool = setInterval(function(){
-          const coolDown = document.getElementById(name + '-cool-down');
-          if (timer <= 0) {
-              clearInterval(cool);
-              if (coolDown) {
-                  coolDown.style.width = 0;
-              }
-              button.available = true;
-          } else {
-              if (coolDown) {
-                  coolDown.style.width = timer + '%';
-              }
-              timer -= 1;
-          }
-      }, 10 * button.cooldown)
+      const coolDown = document.getElementById(name + '-cool-down');
+      coolDown.style.animationDuration = button.cooldown + 's';
+      coolDown.className += ' start-cool';
+
+      document.addEventListener('animationend', () => {
+        coolDown.classList.remove('start-cool');
+        button.available = true;
+      });
     },
     inflate: function(name, loss) {
       const button = this.buttons[name]
