@@ -27,16 +27,13 @@ export default {
     hide: {
       inserted: function(el, binding) {
         if (binding.value == false){
-        el.style.position = 'absolute';
         el.style.left = '9000px';
         }
       },
       update: function(el, binding) {
         if (binding.value == false){
-        el.style.position = 'absolute';
         el.style.left = '9000px';
         } else {
-        el.style.position = 'relative';
         el.style.left = '0px';
         }
       } 
@@ -69,6 +66,13 @@ export default {
           available: true,
           gain: {particles: 0},
           loss: {particles: 10}
+        },
+        atmosphere: {
+          msg: 'A layer of oxygen covers your planet, helping you stay cool under pressure.',
+          // otherFunctions: ['startCount'],
+          inflation: 100,
+          gain: {atmosphere: 1},
+          loss: {oxygen: 100}
         },
         mass: {
           msg: 'You committed some mass to your core, your influance can reach further.',
@@ -116,6 +120,11 @@ export default {
           amount: 0,
           gain: {carbon: 5, hydrogen: 5, oxygen: 5},
           loss: {particles: 0}
+        },
+        atmosphere: {
+          amount: 0,
+          gain: {carbon: 5, hydrogen: 5, oxygen: 5},
+          loss: {particles: 0},
         }
       },
       moons: {
@@ -241,6 +250,9 @@ export default {
         if (trade.cooldown) {
           this.coolDown(name);
         }
+        if (name == 'atmosphere') {
+          this.addAtmosphere();
+        }
         // Subtracting
         lossKeys.map(loss => {
           if (!this.Elements[loss]) {
@@ -283,6 +295,15 @@ export default {
         coolDown.classList.remove('start-cool');
         button.available = true;
       });
+    },
+    addAtmosphere: function () {
+      console.log('add')
+        let buttonKeys = Object.keys(this.buttons)
+        buttonKeys.map(thisButton => {
+          if (this.buttons[thisButton].cooldown) {
+            this.buttons[thisButton].cooldown /= 2
+          }
+        })
     },
     inflate: function(name, loss) {
       const button = this.buttons[name]

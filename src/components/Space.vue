@@ -12,6 +12,14 @@
       </button>
 
       <button
+      v-if="data.makeAvailable('availableButtons', 'sorter', data.upgrades.sorter.amount >= 2)"
+      id="atmosphere"
+      @click="data.clickEvent('atmosphere')"
+      :title="data.toolTip('atmosphere')">
+        Collect atmosphere
+      </button>
+
+      <button
       v-if="data.makeAvailable('availableButtons', 'sorter', Elements.particles.amount >= 50)"
       id="sorter"
       @click="data.clickEvent('sorter')"
