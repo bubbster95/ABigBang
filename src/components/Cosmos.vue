@@ -54,7 +54,6 @@ export default {
         },
         sorter: {
           msg: 'You\'ve got a lot on your plate, so you create a way to organize some particles.',
-          // otherFunctions: ['startCount'],
           inflation: 50,
           gain: {sorter: 1},
           loss: {particles: 50}
@@ -69,7 +68,6 @@ export default {
         },
         atmosphere: {
           msg: 'A layer of oxygen covers your planet, helping you stay cool under pressure.',
-          // otherFunctions: ['startCount'],
           inflation: 100,
           gain: {atmosphere: 1},
           loss: {oxygen: 100}
@@ -83,19 +81,29 @@ export default {
         },
         carbonMoon: {
           msg: 'A ball of carbon circles around you collecting carbon on your behalf.',
-          otherFunctions: ['startCount'],
+          // otherFunctions: ['startCount'],
           gain: {cMoon: 1},
-          loss: {mass: 1, carbon: 20}
+          loss: {mass: 0, carbon: 100}
+        },
+        hydrogenMoon: {
+          msg: 'A mass of carbon particles explode from you and form a new moon collecting hydrogen on your behalf.',
+          gain: {hMoon: 3},
+          loss: {mass: 0, hydrogen: 2000, carbon: 200}
+        },
+        oxygenMoon: {
+          msg: 'A ball of carbon circles around you collecting carbon on your behalf.',
+          gain: {oMoon: 2},
+          loss: {mass: 0, oxygen: 1000, carbon: 1000}
         },
         add: {
           msg: 'You re-alocated some mass to a moon.',
-          gain: {cMoon: 1},
+          // gain: {},
           loss: {mass: 1}
         },
         subtract: {
           msg: 'You removed some mass from a moon.',
           gain: {mass: 1},
-          loss: {cMoon: 1}
+          // loss: {}
         }
       },
       visibleTab: {
@@ -112,6 +120,8 @@ export default {
         mass: false,
         carbonMoon: false,
         carbonManager: false,
+        hydrogenManager: false,
+        oxygenManager: false,
         sort: true,
 
       },
@@ -129,9 +139,9 @@ export default {
       },
       moons: {
         'mass': {
-            amount: 1,
-            gain: {particles: 10},
-            loss: {particles: 0}
+          amount: 1,
+          gain: {particles: 10},
+          loss: {particles: 0}
         },
         cMoon: {
           amount: 0,
@@ -141,6 +151,11 @@ export default {
         hMoon: {
           amount: 0,
           gain: {hydrogen: 10},
+          loss: {particles: 0}
+        },
+        oMoon: {
+          amount: 0,
+          gain: {oxygen: 10},
           loss: {particles: 0}
         }
       }
@@ -158,11 +173,19 @@ export default {
       if (this.second >= 10) {
       this.second = 0;
       this.exchangeRate('cMoon', 'moon')
+      this.exchangeRate('hMoon', 'moon')
+      this.exchangeRate('oMoon', 'moon')
       this.exchangeRate('mass', 'moon')
 
       }
     },
-    clickEvent: function(name) {
+    clickEvent: function(name, moon) {
+      if (name == 'add') {
+        this.buttons[name].gain = {[moon]: 1};
+      } 
+      if (name == 'subtract') {
+        this.buttons[name].loss = {[moon]: 1};
+      }
       let button = this.buttons[name]
 
       if (button.available == false) {

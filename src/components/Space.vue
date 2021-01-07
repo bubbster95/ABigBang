@@ -11,20 +11,21 @@
           <div class='cool-down' id='rotate-cool-down'></div>
       </button>
 
-      <button
-      v-if="data.makeAvailable('availableButtons', 'sorter', data.upgrades.sorter.amount >= 2)"
-      id="atmosphere"
-      @click="data.clickEvent('atmosphere')"
-      :title="data.toolTip('atmosphere')">
-        Collect atmosphere
-      </button>
 
       <button
-      v-if="data.makeAvailable('availableButtons', 'sorter', Elements.particles.amount >= 50)"
+      v-if="data.makeAvailable('availableButtons', 'sorter', Elements.particles.amount >= 30)"
       id="sorter"
       @click="data.clickEvent('sorter')"
       :title="data.toolTip('sorter')">
         Create sorter
+      </button>
+
+      <button
+      v-if="data.makeAvailable('availableButtons', 'atmosphere', Elements.oxygen.amount >= 50)"
+      id="atmosphere"
+      @click="data.clickEvent('atmosphere')"
+      :title="data.toolTip('atmosphere')">
+        Collect atmosphere
       </button>
 
       <button
@@ -36,11 +37,27 @@
       </button>
 
       <button
-      v-if="data.makeAvailable('availableButtons', 'carbonMoon', data.upgrades.sorter.amount >= 1)"
+      v-if="data.makeAvailable('availableButtons', 'carbonMoon', Elements.carbon.amount >= 30)"
       id="carbonMoon"
       @click="data.clickEvent('carbonMoon')"
       :title="data.toolTip('carbonMoon')">
         Carbon moon
+      </button>
+
+      <button
+      v-if="data.makeAvailable('availableButtons', 'hydrogenMoon', Elements.hydrogen.amount >= 500)"
+      id="hydrogenMoon"
+      @click="data.clickEvent('hydrogenMoon')"
+      :title="data.toolTip('hydrogenMoon')">
+        Hydrogen moon
+      </button>
+
+      <button
+      v-if="data.makeAvailable('availableButtons', 'oxygenMoon', Elements.oxygen.amount >= 100)"
+      id="oxygenMoon"
+      @click="data.clickEvent('oxygenMoon')"
+      :title="data.toolTip('oxygenMoon')">
+        Oxygen moon
       </button>
     </div>
   </div>

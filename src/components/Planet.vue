@@ -24,7 +24,6 @@
       <button
         class="add"
         @click="data.clickEvent('add', 'cMoon')"
-        :title="data.toolTip('add')"
       >
         ^
       </button>
@@ -32,7 +31,42 @@
       <button
         class="subtract"
         @click="data.clickEvent('subtract', 'cMoon')"
-        :title="data.toolTip('subtract')"
+      >v</button>
+    </div>
+
+    <div
+    v-if="data.makeAvailable('availableButtons', 'hydrogenManager', data.moons.hMoon.amount >= 1)"
+    id="hydrogen-manager"
+    class="manager">
+      <h4>Hydrogen moon</h4>
+      <button
+        class="add"
+        @click="data.clickEvent('add', 'hMoon')"
+      >
+        ^
+      </button>
+      <h4>{{data.moons.hMoon.amount}}</h4>
+      <button
+        class="subtract"
+        @click="data.clickEvent('subtract', 'hMoon')"
+      >v</button>
+    </div>
+
+    <div
+    v-if="data.makeAvailable('availableButtons', 'oxygenManager', data.moons.oMoon.amount >= 1)"
+    id="oxygen-manager"
+    class="manager">
+      <h4>Oxygen moon</h4>
+      <button
+        class="add"
+        @click="data.clickEvent('add', 'oMoon')"
+      >
+        ^
+      </button>
+      <h4>{{data.moons.oMoon.amount}}</h4>
+      <button
+        class="subtract"
+        @click="data.clickEvent('subtract', 'oMoon')"
       >v</button>
     </div>
   </div>
